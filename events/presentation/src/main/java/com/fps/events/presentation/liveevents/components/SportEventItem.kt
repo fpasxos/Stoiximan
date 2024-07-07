@@ -86,7 +86,7 @@ private fun EventItemPreview() {
                 eventStartTime = 10000000,
                 isFavourite = false
             ),
-            onFavouriteClick = { String, Boolean -> }
+            onFavouriteClick = { _, Boolean -> }
 
         )
     }

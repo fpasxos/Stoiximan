@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.stoiximan.android.application.compose)
     alias(libs.plugins.stoiximan.jvm.ktor)
+    alias(libs.plugins.stoiximan.jvm.junit5)
+    alias(libs.plugins.stoiximan.android.junit5)
 }
 
 android {

@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.stoiximan.android.feature.ui)
-//    alias(libs.plugins.stoiximan.jvm.junit5)
+    alias(libs.plugins.stoiximan.jvm.junit5)
 }
 
 android {
@@ -17,5 +17,5 @@ dependencies {
     implementation(projects.events.domain)
 
 //    implementation(libs.junit5.api)
-//    implementation(libs.coroutines.test)
+    implementation(libs.coroutines.test)
 }
