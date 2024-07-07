@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vs">vs</string>
+    <string name="no_live_events_found">Please check back later or add some favourite events.</string>
+</resources>
