@@ -204,5 +204,7 @@ fun ExpandableSportEventCard(
 
 private fun calculateRowsWithFixedHeight(items: Int): Int {
     val rows = items.div(4)
-    return rows.times(210)
+    // here, if the rows is zero then we need at least ONE row, so we return 210.
+    // If rows is greater than zero, then we want the value of rows needed
+    return if (rows > 0) rows.times(210) else 210
 }
