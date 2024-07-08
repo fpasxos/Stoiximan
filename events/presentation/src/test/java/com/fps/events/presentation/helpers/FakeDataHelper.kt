@@ -41,7 +41,7 @@ object FakeDataHelper {
 
     private fun getRandomSportEvent(sportId: String): SportEvent {
         return SportEvent(
-            eventId = Random.nextInt().toString(),
+            eventId = (0..100000).random().toString(),
             sportId = sportId,
             fullEventName = getRandomTeamName(),
             eventStartTime = getRandomFutureUnixTime(),

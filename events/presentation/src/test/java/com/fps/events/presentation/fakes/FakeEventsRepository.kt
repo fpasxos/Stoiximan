@@ -2,7 +2,6 @@ package com.fps.events.presentation.fakes
 
 import com.fps.core.domain.events.EventsRepository
 import com.fps.core.domain.events.SportCategory
-import com.fps.core.domain.events.SportEvent
 import com.fps.core.domain.util.DataError
 import com.fps.core.domain.util.EmptyResult
 import com.fps.core.domain.util.Result
@@ -16,32 +15,31 @@ class FakeEventsRepository(
 ) : EventsRepository {
 
     var shouldReturnError = false
-    var errorToReturn : Exception? = null
+    var errorToReturn: Exception? = null
 
     private val liveEvents = mutableListOf<SportCategory>()
 
-    fun setLiveEvents(events: List<SportCategory>) {
-        liveEvents.clear()
-        liveEvents.addAll(events)
-    }
-
     override fun getLocalLiveEvents(): Flow<List<SportCategory>> {
-        return flowOf(liveEvents)
+        return localSportEventsDataSource.retrieveAllSportEvents()
     }
 
     override suspend fun getLiveEvents(): EmptyResult<DataError> {
-        return Result.Success("").asEmptyDataResult()
+        return remoteLiveEventsDataSource.getLiveEvents().also {
+            if (it is Result.Success) {
+                localSportEventsDataSource.saveSportEvents(it.data)
+            }
+        }.asEmptyDataResult()
     }
 
 
     override suspend fun setSportEventAsFavourite(sportId: String, isFavourite: Boolean) {
-
+        localSportEventsDataSource.saveSportEventAsFavourite(sportId, isFavourite)
     }
 
     override suspend fun showFavouritesOnlyFromSportCategory(
         categoryId: String,
         isFavourite: Boolean
     ) {
-
+        localSportEventsDataSource.saveFavouritesOnlyFromCategory(categoryId, isFavourite)
     }
 }

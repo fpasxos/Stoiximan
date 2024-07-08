@@ -7,17 +7,14 @@ import com.fps.core.domain.util.Result
 
 class FakeRemoteEventsDataSource : RemoteEventsDataSource {
 
-    private var listOfSportCategories = mutableListOf(
-        SportCategory(
-            sportId = "1234",
-            sportName = "Football",
-            activeSportEvents = arrayListOf(),
-            isShowOnlyFavourites = true
-        )
-    )
+    private var listOfSportCategories = mutableListOf<SportCategory>()
+
+    fun setRandomLiveEvents(fakeSportCategories: List<SportCategory>) {
+        listOfSportCategories.clear()
+        listOfSportCategories.addAll(fakeSportCategories)
+    }
 
     override suspend fun getLiveEvents(): Result<List<SportCategory>, DataError.Network> {
         return Result.Success(listOfSportCategories)
-
     }
 }
