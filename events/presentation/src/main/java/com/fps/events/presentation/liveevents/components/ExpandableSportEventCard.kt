@@ -203,6 +203,6 @@ fun ExpandableSportEventCard(
 }
 
 private fun calculateRowsWithFixedHeight(items: Int): Int {
-    val rows = items.div(4) + 1
+    val rows = items.div(4)
     return rows.times(210)
 }

@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.fps.events.presentation
 
+import app.cash.turbine.test
 import assertk.assertThat
 import com.fps.events.presentation.fakes.FakeConnectivityManager
 import com.fps.events.presentation.fakes.FakeEventsRepository
@@ -11,10 +14,11 @@ import com.fps.events.presentation.liveevents.LiveEventsViewModel
 import com.fps.events.presentation.liveevents.SportEventsAction
 import com.fps.events.presentation.liveevents.mappers.toSportCategoryItemUi
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-//import kotlinx.coroutines.Dispatchers
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,14 +37,24 @@ class LiveEventsViewModelTest {
 
     private lateinit var viewModel: LiveEventsViewModel
     private lateinit var fakeEventsRepository: FakeEventsRepository
+
+    private lateinit var fakeLocalSportEventsDataSource: FakeLocalSportEventsDataSource
+    private lateinit var fakeRemoteSportEventsDataSource: FakeRemoteEventsDataSource
+
     private lateinit var fakeConnectivityManager: FakeConnectivityManager
     private lateinit var viewModelAction: SportEventsAction
 
     @BeforeEach
     fun setUp() {
+        fakeLocalSportEventsDataSource = FakeLocalSportEventsDataSource()
+        fakeRemoteSportEventsDataSource = FakeRemoteEventsDataSource()
+
+        testDispatcher = UnconfinedTestDispatcher()
+        testScope = CoroutineScope(testDispatcher)
+
         fakeEventsRepository = FakeEventsRepository(
-            localSportEventsDataSource = FakeLocalSportEventsDataSource(),
-            remoteLiveEventsDataSource = FakeRemoteEventsDataSource()
+            localSportEventsDataSource = fakeLocalSportEventsDataSource,
+            remoteLiveEventsDataSource = fakeRemoteSportEventsDataSource
         )
 
         fakeConnectivityManager = FakeConnectivityManager()
@@ -76,6 +90,11 @@ class LiveEventsViewModelTest {
                 isFavouritesChecked = true
             )
         )
+
+        fakeEventsRepository.getLocalLiveEvents().test {
+            awaitEvent()
+            viewModel.state.sportEvents
+        }
 
         fakeEventsRepository.getLocalLiveEvents().onEach { sportCategory ->
             val sportCategoryItem = sportCategory

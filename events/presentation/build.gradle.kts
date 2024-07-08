@@ -15,7 +15,4 @@ dependencies {
 
     implementation(projects.core.domain)
     implementation(projects.events.domain)
-
-//    implementation(libs.junit5.api)
-    implementation(libs.coroutines.test)
 }

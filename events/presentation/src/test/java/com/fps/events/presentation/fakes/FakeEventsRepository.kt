@@ -14,15 +14,19 @@ class FakeEventsRepository(
     private val localSportEventsDataSource: FakeLocalSportEventsDataSource,
     private val remoteLiveEventsDataSource: FakeRemoteEventsDataSource,
 ) : EventsRepository {
-    private val liveEvents = mutableListOf<SportEvent>()
 
-    fun setLiveEvents(events: List<SportEvent>) {
+    var shouldReturnError = false
+    var errorToReturn : Exception? = null
+
+    private val liveEvents = mutableListOf<SportCategory>()
+
+    fun setLiveEvents(events: List<SportCategory>) {
         liveEvents.clear()
         liveEvents.addAll(events)
     }
 
     override fun getLocalLiveEvents(): Flow<List<SportCategory>> {
-        return flowOf()
+        return flowOf(liveEvents)
     }
 
     override suspend fun getLiveEvents(): EmptyResult<DataError> {
