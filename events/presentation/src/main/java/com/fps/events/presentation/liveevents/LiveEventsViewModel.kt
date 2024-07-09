@@ -28,7 +28,7 @@ class LiveEventsViewModel(
 
     private val networkStatus: StateFlow<NetworkConnectivityState> =
         connectivityManager.networkState().stateIn(
-            initialValue = NetworkConnectivityState.Unavailable,
+            initialValue = NetworkConnectivityState.Available,
             scope = viewModelScope,
             started = WhileSubscribed(5000)
         )
@@ -36,22 +36,31 @@ class LiveEventsViewModel(
     init {
         viewModelScope.launch {
             launch {
-                networkStatus.collect {
-                    state =
-                        state.copy(isConnectedToNetwork = it == NetworkConnectivityState.Available)
-                }
+                collectNetworkStatus()
             }
         }
+        getLocalLiveEvents()
+        fetchRemoteLiveEvents()
+    }
 
+    private suspend fun collectNetworkStatus() {
+        networkStatus.collect {
+            state =
+                state.copy(isConnectedToNetwork = it == NetworkConnectivityState.Available)
+        }
+    }
+    private fun getLocalLiveEvents() {
         liveEventsRepository.getLocalLiveEvents().onEach { liveEvents ->
-            val sportCategoryItems = liveEvents.map { it.toSportCategoryItemUi() }
+            val sportCategoryItems = liveEvents.map { it.toSportCategoryItemUi(viewModelScope) }
             state = state.copy(
                 sportEvents = sportCategoryItems,
                 filteredFavouritesSportEvents = filterSportCategories(sportCategoryItems),
                 isLoading = false
             )
         }.launchIn(viewModelScope)
+    }
 
+    private fun fetchRemoteLiveEvents() {
         viewModelScope.launch {
             liveEventsRepository.getLiveEvents()
             state = state.copy(isLoading = false)

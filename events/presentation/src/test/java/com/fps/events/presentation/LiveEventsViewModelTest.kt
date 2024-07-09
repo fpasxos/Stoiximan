@@ -2,6 +2,7 @@
 
 package com.fps.events.presentation
 
+import app.cash.turbine.test
 import com.fps.core.domain.connectivity.ConnectivityManager
 import com.fps.core.domain.connectivity.NetworkConnectivityState
 import com.fps.core.domain.events.SportCategory
@@ -20,6 +21,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
@@ -78,8 +80,7 @@ class LiveEventsViewModelTest {
 
 
         viewModel = LiveEventsViewModel(
-            liveEventsRepository = fakeEventsRepository,
-            connectivityManager = connectivityManager
+            liveEventsRepository = fakeEventsRepository, connectivityManager = connectivityManager
         )
     }
 
@@ -125,9 +126,8 @@ class LiveEventsViewModelTest {
     @Test
     fun `onFavouriteClick action sets non-favourite event as favourite`() = runTest {
         // Find a non-favourite event
-        val nonFavouriteEvent = viewModel.state.sportEvents
-            .flatMap { it.activeSportEvents }
-            .first { !it.isFavourite }
+        val nonFavouriteEvent =
+            viewModel.state.sportEvents.flatMap { it.activeSportEvents }.first { !it.isFavourite }
 
         val eventId = nonFavouriteEvent.id
 
@@ -136,9 +136,8 @@ class LiveEventsViewModelTest {
         testScheduler.advanceUntilIdle()
 
         // Verify that the event is now marked as favourite
-        val updatedEvent = viewModel.state.sportEvents
-            .flatMap { it.activeSportEvents }
-            .first { it.id == eventId }
+        val updatedEvent =
+            viewModel.state.sportEvents.flatMap { it.activeSportEvents }.first { it.id == eventId }
 
         assertTrue(updatedEvent.isFavourite)
     }
@@ -152,8 +151,7 @@ class LiveEventsViewModelTest {
 
         viewModel.onAction(
             SportEventsAction.OnShowOnlyFavourites(
-                id = nonFavouriteCategory.sportId,
-                isFavouritesChecked = true
+                id = nonFavouriteCategory.sportId, isFavouritesChecked = true
             )
         )
         advanceUntilIdle()
@@ -165,5 +163,4 @@ class LiveEventsViewModelTest {
             "All active sport events in the filtered category should be favourites"
         }
     }
-
 }
